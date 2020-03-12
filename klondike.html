@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Klondike Solitaire</title>
+	<style type="text/css">
+		html, body { margin: 0; padding: 0; }
+		#backbuffer {
+			height: 100%;
+			width: 100%;
+			background-color: #207346;
+		}
+	</style>
+</head>
+<body>
+<canvas id="backbuffer"></canvas>
+<script type="text/javascript">
+	var backbuffer = document.querySelector("#backbuffer");
+	backbuffer.width = window.innerWidth;
+	backbuffer.height = window.innerHeight;
+
+	const Suites = {
+		HEARTS: "H",
+		DIAMONDS: "D",
+		CLUBS: "C",
+		SPADES: "S"
+	}
+
+	const Ranks = {
+		KING: "K",
+		QUEEN: "Q",
+		JACK: "J",
+		TEN: "10",
+		NINE: "9",
+		EIGHT: "8",
+		SEVEN: "7",
+		SIX: "6",
+		FIVE: "5",
+		FOUR: "4",
+		THREE: "3",
+		TWO: "2",
+		ACE: "A"
+	}
+
+	class Card {
+		static width = 60;
+		static height = 80;
+		Color() { return this.suite == Suites.HEARTS || this.suite == Suites.DIAMONDS ? "#ff0000" : "#000000"; }
+
+		constructor(suite, rank) {
+			this.parent = null;
+			this.children = [];
+			this.suite = suite;
+			this.rank = rank;
+			this.x = 0;
+			this.y = 0;
+			this.face = false;
+		}
+
+		static Shuffle(array) {
+			var currentIndex = array.length, temporaryValue, randomIndex;
+		
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+		
+				// And swap it with the current element.
+				temporaryValue = array[currentIndex];
+				array[currentIndex] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+			return array;
+		}
+
+		ToggleFace() {
+			this.face = !this.face;
+		}
+
+		Update() {
+
+		}
+
+		Draw(graphics) {
+			if (this.face) {
+				graphics.context.fillStyle = "#efefef";
+				graphics.context.fillRect(x, y, Card.width, Card.height);
+				graphics.context.strokeRect(x, y, Card.width, Card.height);
+				graphics.drawText(this.suite + "-" + this.rank, x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center");
+			} else {
+				graphics.context.fillStyle = "#aaaaff";
+				graphics.context.fillRect(x, y, Card.width, Card.height);
+				graphics.context.strokeRect(x, y, Card.width, Card.height);
+			}
+		}
+	}
+
+	var graphics = {
+		context: backbuffer.getContext("2d"),
+		markerOffset: 4,
+		cardStart: 32,
+		cardGutter: 16,
+
+		init: function() {
+			this.context.font = "14px Arial";
+		},
+
+		drawText: function(text, x, y, color, align = "left") {
+			this.context.textAlign = align;
+			this.context.fillStyle = color;
+			this.context.fillText(text, x, y);
+		},
+
+		drawMarker: function(x, y) {
+			this.context.strokeRect(x - this.markerOffset, y - this.markerOffset, Card.width + (this.markerOffset * 2), Card.height + (this.markerOffset * 2));
+		},
+
+		getRawPosition(x, y) {
+			return {
+				x: this.cardStart + ((Card.width + this.cardGutter) * x),
+				y: this.cardStart + ((Card.height + this.cardGutter) * y)
+			}
+		},
+
+		getNextX() { return Card.width + this.cardGutter; },
+		getNextY() { return Card.height + this.cardGutter; }
+	}
+
+	// Initialize graphics
+	graphics.init();
+
+
+
+	// Create deck
+	var deck = [];
+	for (var suite in Suites) {
+		for (var rank in Ranks) {
+			deck.push(new Card(suite, rank));
+		}
+	}
+	Card.Shuffle(deck);
+	for (var i = 0; i < deck.length; i++) {
+	 	console.log(deck[i].suite + "-" + deck[i].rank);
+	}
+
+
+
+	// [ D E C K ]---------------------------------------
+	// Initialize draw coordinate
+	var pos = graphics.getRawPosition(0, 0);
+
+	// Draw deck marker
+	graphics.drawMarker(pos.x, pos.y);
+	// --------------------------------------------------
+
+
+
+	// [ F O U N D A T I O N ]---------------------------
+	// Reposition draw coordinate for foundation
+	pos = graphics.getRawPosition(3, 0);
+
+	// Draw foundation markers
+	for (var i = 0; i < 4; i++) {
+		graphics.drawMarker(pos.x, pos.y);
+		pos.x += graphics.getNextX();
+	}
+	// --------------------------------------------------
+
+
+
+	// [ T A B L E A U ]---------------------------------
+	// Reposition draw coordinate for tableau
+	pos = graphics.getRawPosition(0, 1.5);
+
+	// Draw tableau markers
+	for (var i = 0; i < 7; i++) {
+		graphics.drawMarker(pos.x, pos.y);
+		pos.x += graphics.getNextX();
+	}
+	// --------------------------------------------------
+
+
+
+</script>
+</body>
+</html>
