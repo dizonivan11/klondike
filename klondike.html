@@ -107,7 +107,8 @@
 				graphics.context.fillStyle = "#efefef";
 				graphics.context.fillRect(x, y, Card.width, Card.height);
 				graphics.context.strokeRect(x, y, Card.width, Card.height);
-				graphics.drawText(this.suite + "-" + this.rank, x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center");
+				graphics.drawText(this.suite, x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center");
+				graphics.drawText(this.rank, x + (Card.width / 2), y + (Card.height / 2) + graphics.textSize, this.Color(), "center");
 			} else {
 				graphics.context.fillStyle = "#aaaaff";
 				graphics.context.fillRect(x, y, Card.width, Card.height);
@@ -122,9 +123,10 @@
 		markerOffset: 4,
 		cardStart: 32,
 		cardGutter: 16,
+		textSize: 10,
 
 		init: function() {
-			this.context.font = "14px Arial";
+			this.context.font = this.textSize + "px Arial";
 		},
 
 		drawText: function(text, x, y, color, align = "left") {
