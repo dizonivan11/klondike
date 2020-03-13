@@ -19,16 +19,16 @@
 	backbuffer.height = window.innerHeight;
 
 	const Suites = {
-		HEARTS: "H",
-		DIAMONDS: "D",
-		CLUBS: "C",
-		SPADES: "S"
+		HEARTS: "HEARTS",
+		DIAMONDS: "DIAMONDS",
+		CLUBS: "CLUBS",
+		SPADES: "SPADES"
 	}
 
 	const Ranks = {
-		KING: "K",
-		QUEEN: "Q",
-		JACK: "J",
+		KING: "KING",
+		QUEEN: "QUEEN",
+		JACK: "JACK",
 		TEN: "10",
 		NINE: "9",
 		EIGHT: "8",
@@ -38,7 +38,7 @@
 		FOUR: "4",
 		THREE: "3",
 		TWO: "2",
-		ACE: "A"
+		ACE: "ACE"
 	}
 
 	class Card {
@@ -110,7 +110,7 @@
 				graphics.drawText(this.suite, x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center");
 				graphics.drawText(this.rank, x + (Card.width / 2), y + (Card.height / 2) + graphics.textSize, this.Color(), "center");
 			} else {
-				graphics.context.fillStyle = "#aaaaff";
+				graphics.context.fillStyle = "#ccccff";
 				graphics.context.fillRect(x, y, Card.width, Card.height);
 				graphics.context.strokeRect(x, y, Card.width, Card.height);
 			}
