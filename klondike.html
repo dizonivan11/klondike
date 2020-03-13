@@ -42,22 +42,40 @@
 	}
 
 	class Card {
+		static tableauNumber = 7;
 		static width = 60;
 		static height = 80;
+		static pileOffset = 16;
 		Color() { return this.suite == Suites.HEARTS || this.suite == Suites.DIAMONDS ? "#ff0000" : "#000000"; }
 
 		constructor(suite, rank) {
 			this.parent = null;
-			this.children = [];
+			this.children = null;
 			this.suite = suite;
 			this.rank = rank;
-			this.x = 0;
-			this.y = 0;
 			this.face = false;
 		}
 
-		static Shuffle(array) {
-			var currentIndex = array.length, temporaryValue, randomIndex;
+		static CreateDeck() {
+			var deck = [];
+			for (var suite in Suites) {
+				for (var rank in Ranks) {
+					deck.push(new Card(suite, rank));
+				}
+			}
+			return deck;
+		}
+
+		static CreateTableau() {
+			var tableau = [];
+			for (var t = 0; t < this.tableauNumber; t++) {
+				tableau.push([]);
+			}
+			return tableau;
+		}
+
+		static Shuffle(deck) {
+			var currentIndex = deck.length, temporaryValue, randomIndex;
 		
 			// While there remain elements to shuffle...
 			while (0 !== currentIndex) {
@@ -66,22 +84,25 @@
 				currentIndex -= 1;
 		
 				// And swap it with the current element.
-				temporaryValue = array[currentIndex];
-				array[currentIndex] = array[randomIndex];
-				array[randomIndex] = temporaryValue;
+				temporaryValue = deck[currentIndex];
+				deck[currentIndex] = deck[randomIndex];
+				deck[randomIndex] = temporaryValue;
 			}
-			return array;
+			return deck;
 		}
+
+		static DrawCardFrom(deck) { return deck.pop(); }
 
 		ToggleFace() {
 			this.face = !this.face;
 		}
 
-		Update() {
-
+		PileTo(parent) {
+			this.parent = parent;
+			parent.children = this;
 		}
 
-		Draw(graphics) {
+		Draw(graphics, x, y) {
 			if (this.face) {
 				graphics.context.fillStyle = "#efefef";
 				graphics.context.fillRect(x, y, Card.width, Card.height);
@@ -92,6 +113,7 @@
 				graphics.context.fillRect(x, y, Card.width, Card.height);
 				graphics.context.strokeRect(x, y, Card.width, Card.height);
 			}
+			if (this.children != null) Draw(graphics);
 		}
 	}
 
@@ -129,23 +151,13 @@
 	// Initialize graphics
 	graphics.init();
 
-
-
-	// Create deck
-	var deck = [];
-	for (var suite in Suites) {
-		for (var rank in Ranks) {
-			deck.push(new Card(suite, rank));
-		}
-	}
-	Card.Shuffle(deck);
-	for (var i = 0; i < deck.length; i++) {
-	 	console.log(deck[i].suite + "-" + deck[i].rank);
-	}
-
-
+	
 
 	// [ D E C K ]---------------------------------------
+	// Create deck
+	var deck = Card.CreateDeck();
+	Card.Shuffle(deck);
+
 	// Initialize draw coordinate
 	var pos = graphics.getRawPosition(0, 0);
 
@@ -160,7 +172,7 @@
 	pos = graphics.getRawPosition(3, 0);
 
 	// Draw foundation markers
-	for (var i = 0; i < 4; i++) {
+	for (var f = 0; f < 4; f++) {
 		graphics.drawMarker(pos.x, pos.y);
 		pos.x += graphics.getNextX();
 	}
@@ -169,13 +181,39 @@
 
 
 	// [ T A B L E A U ]---------------------------------
-	// Reposition draw coordinate for tableau
+	// Create Tableau
+	var tableau = Card.CreateTableau();
+
+	// Make incremental pile to tableau
+	for (var t = 0; t < tableau.length; t++) {
+		for (var p = 0; p < t + 1; p++) {
+			tableau[t].push(Card.DrawCardFrom(deck));
+		}
+		// Open last card on pile in tableau
+		tableau[t][tableau[t].length - 1].ToggleFace();
+	}
+
+	// Reposition draw coordinate for tableau markers
 	pos = graphics.getRawPosition(0, 1.5);
 
 	// Draw tableau markers
-	for (var i = 0; i < 7; i++) {
+	for (var t = 0; t < tableau.length; t++) {
 		graphics.drawMarker(pos.x, pos.y);
 		pos.x += graphics.getNextX();
+	}
+
+	// Reposition draw coordinate for tableau piles
+	pos = graphics.getRawPosition(0, 1.5);
+	var yPileStart = pos.y;
+
+	// Draw tableau piles
+	for (var t = 0; t < tableau.length; t++) {
+		for (var p = 0; p < tableau[t].length; p++) {
+			tableau[t][p].Draw(graphics, pos.x, pos.y);
+			pos.y += Card.pileOffset;
+		}
+		pos.x += graphics.getNextX();
+		pos.y = yPileStart;
 	}
 	// --------------------------------------------------
 
