@@ -10,6 +10,11 @@
 			background-color: #207346;
 		}
 	</style>
+	<script src="suites.js"></script>
+	<script src="ranks.js"></script>
+	<script src="graphics.js"></script>
+	<script src="card.js"></script>
+	<script src="ai.js"></script>
 </head>
 <body>
 <canvas id="backbuffer"></canvas>
@@ -18,209 +23,39 @@
 	backbuffer.width = window.innerWidth;
 	backbuffer.height = window.innerHeight;
 
-	const Suites = {
-		HEARTS: "HEARTS",
-		DIAMONDS: "DIAMONDS",
-		CLUBS: "CLUBS",
-		SPADES: "SPADES"
-	}
-
-	const Ranks = {
-		KING: "KING",
-		QUEEN: "QUEEN",
-		JACK: "JACK",
-		TEN: "10",
-		NINE: "9",
-		EIGHT: "8",
-		SEVEN: "7",
-		SIX: "6",
-		FIVE: "5",
-		FOUR: "4",
-		THREE: "3",
-		TWO: "2",
-		ACE: "ACE"
-	}
-
-	class Card {
-		static tableauNumber = 7;
-		static width = 60;
-		static height = 80;
-		static pileOffset = 16;
-		Color() { return this.suite == Suites.HEARTS || this.suite == Suites.DIAMONDS ? "#ff0000" : "#000000"; }
-
-		constructor(suite, rank) {
-			this.parent = null;
-			this.children = null;
-			this.suite = suite;
-			this.rank = rank;
-			this.face = false;
-		}
-
-		static CreateDeck() {
-			var deck = [];
-			for (var suite in Suites) {
-				for (var rank in Ranks) {
-					deck.push(new Card(suite, rank));
-				}
-			}
-			return deck;
-		}
-
-		static CreateTableau() {
-			var tableau = [];
-			for (var t = 0; t < this.tableauNumber; t++) {
-				tableau.push([]);
-			}
-			return tableau;
-		}
-
-		static Shuffle(deck) {
-			var currentIndex = deck.length, temporaryValue, randomIndex;
-		
-			// While there remain elements to shuffle...
-			while (0 !== currentIndex) {
-				// Pick a remaining element...
-				randomIndex = Math.floor(Math.random() * currentIndex);
-				currentIndex -= 1;
-		
-				// And swap it with the current element.
-				temporaryValue = deck[currentIndex];
-				deck[currentIndex] = deck[randomIndex];
-				deck[randomIndex] = temporaryValue;
-			}
-			return deck;
-		}
-
-		static DrawCardFrom(deck) { return deck.pop(); }
-
-		ToggleFace() {
-			this.face = !this.face;
-		}
-
-		PileTo(parent) {
-			this.parent = parent;
-			parent.children = this;
-		}
-
-		Draw(graphics, x, y) {
-			if (this.face) {
-				graphics.context.fillStyle = "#efefef";
-				graphics.context.fillRect(x, y, Card.width, Card.height);
-				graphics.context.strokeRect(x, y, Card.width, Card.height);
-				graphics.drawText(this.suite, x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center");
-				graphics.drawText(this.rank, x + (Card.width / 2), y + (Card.height / 2) + graphics.textSize, this.Color(), "center");
-			} else {
-				graphics.context.fillStyle = "#ccccff";
-				graphics.context.fillRect(x, y, Card.width, Card.height);
-				graphics.context.strokeRect(x, y, Card.width, Card.height);
-			}
-			if (this.children != null) Draw(graphics);
-		}
-	}
-
-	var graphics = {
-		context: backbuffer.getContext("2d"),
-		markerOffset: 4,
-		cardStart: 32,
-		cardGutter: 16,
-		textSize: 10,
-
-		init: function() {
-			this.context.font = this.textSize + "px Arial";
-		},
-
-		drawText: function(text, x, y, color, align = "left") {
-			this.context.textAlign = align;
-			this.context.fillStyle = color;
-			this.context.fillText(text, x, y);
-		},
-
-		drawMarker: function(x, y) {
-			this.context.strokeRect(x - this.markerOffset, y - this.markerOffset, Card.width + (this.markerOffset * 2), Card.height + (this.markerOffset * 2));
-		},
-
-		getRawPosition(x, y) {
-			return {
-				x: this.cardStart + ((Card.width + this.cardGutter) * x),
-				y: this.cardStart + ((Card.height + this.cardGutter) * y)
-			}
-		},
-
-		getNextX() { return Card.width + this.cardGutter; },
-		getNextY() { return Card.height + this.cardGutter; }
-	}
-
 	// Initialize graphics
-	graphics.init();
+	var graphics = new Graphics(backbuffer);
 
-	
-
-	// [ D E C K ]---------------------------------------
+	// [ I N I T I A L I Z E ]---------------------------
 	// Create deck
 	var deck = Card.CreateDeck();
 	Card.Shuffle(deck);
 
-	// Initialize draw coordinate
-	var pos = graphics.getRawPosition(0, 0);
+	// Create waste
+	var waste = Card.CreateWaste();
 
-	// Draw deck marker
-	graphics.drawMarker(pos.x, pos.y);
-	// --------------------------------------------------
+	// Create Foundation
+	var foundation = Card.CreateFoundation();
 
-
-
-	// [ F O U N D A T I O N ]---------------------------
-	// Reposition draw coordinate for foundation
-	pos = graphics.getRawPosition(3, 0);
-
-	// Draw foundation markers
-	for (var f = 0; f < 4; f++) {
-		graphics.drawMarker(pos.x, pos.y);
-		pos.x += graphics.getNextX();
-	}
-	// --------------------------------------------------
-
-
-
-	// [ T A B L E A U ]---------------------------------
 	// Create Tableau
 	var tableau = Card.CreateTableau();
 
 	// Make incremental pile to tableau
 	for (var t = 0; t < tableau.length; t++) {
+		const column = tableau[t];
 		for (var p = 0; p < t + 1; p++) {
-			tableau[t].push(Card.DrawCardFrom(deck));
+			column.push(Card.DrawCardFrom(deck));
 		}
 		// Open last card on pile in tableau
-		tableau[t][tableau[t].length - 1].ToggleFace();
-	}
-
-	// Reposition draw coordinate for tableau markers
-	pos = graphics.getRawPosition(0, 1.5);
-
-	// Draw tableau markers
-	for (var t = 0; t < tableau.length; t++) {
-		graphics.drawMarker(pos.x, pos.y);
-		pos.x += graphics.getNextX();
-	}
-
-	// Reposition draw coordinate for tableau piles
-	pos = graphics.getRawPosition(0, 1.5);
-	var yPileStart = pos.y;
-
-	// Draw tableau piles
-	for (var t = 0; t < tableau.length; t++) {
-		for (var p = 0; p < tableau[t].length; p++) {
-			tableau[t][p].Draw(graphics, pos.x, pos.y);
-			pos.y += Card.pileOffset;
-		}
-		pos.x += graphics.getNextX();
-		pos.y = yPileStart;
+		column[column.length - 1].ToggleFace();
 	}
 	// --------------------------------------------------
 
-
-
+	setInterval(function() {
+		graphics.Clear();
+		graphics.Draw(deck, waste, foundation, tableau);
+		Solve();
+	}, 20);
 </script>
 </body>
 </html>
