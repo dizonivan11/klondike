@@ -66,22 +66,21 @@ function Maneuver() {
 
 function TalonToTableau() {
     var hasMoved = false;
-    for (let w = waste.length - 3; w < waste.length; w++) {
-        if (w < 0) continue;
-        const talonCard = waste[w];
+    if (waste.length > 0) {
+        const talonCard = waste[waste.length - 1];
             
         for (let d = 0; d < tableau.length; d++) {
             const destination = tableau[d];
             if (destination.length < 1) {
                 if (talonCard.rank == "KING") {
-                    return MovePileTo(w, waste, destination, true);
+                    return MovePileTo(waste.length - 1, waste, destination, true);
                 }
                 continue;
             };
                 
             const destinationCard = destination[destination.length - 1];
             if (CanPileTo(talonCard, destinationCard)) {
-                return MovePileTo(w, waste, destination);
+                return MovePileTo(waste.length - 1, waste, destination);
             }
         }
     }
