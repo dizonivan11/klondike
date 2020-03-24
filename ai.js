@@ -1,12 +1,11 @@
 function Solve() {
-    if (!Maneuver()) {
-        if (!TalonToTableau()) {
-            if (HasCardFromDeck()) {
-                DrawDeck();
-            } else {
-                ResetDeck();
-            }
-        }
+    if (Maneuver()) return;
+    if (TalonToTableau()) return;
+
+    if (HasCardFromDeck()) {
+        DrawDeck();
+    } else {
+        ResetDeck();
     }
 }
 
