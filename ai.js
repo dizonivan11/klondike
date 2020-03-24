@@ -18,8 +18,9 @@ function CanPileTo(source, destination) {
     return source.Color() != destination.Color() && Ranks[source.rank] + 1 == Ranks[destination.rank];
 }
 
-function MovePileTo(pileStart, source, destination) {
-    if (source[pileStart].previousParent == destination[destination.length - 1]) return false;
+function MovePileTo(pileStart, source, destination, isKing = false) {
+    if (destination.length == 0 && source[pileStart].previousParent == Card.Blank) return false;
+    if (source[pileStart].previousParent == destination[destination.length - 1] && !isKing) return false;
     if (pileStart > 0 && source[pileStart - 1].faced) source[pileStart].previousParent = source[pileStart - 1];
     else source[pileStart].previousParent = Card.Blank;
 
@@ -47,7 +48,7 @@ function Maneuver() {
                 const destination = tableau[d];
                 if (destination.length < 1) {
                     if (pileStartCard.rank == "KING") {
-                        if (MovePileTo(p, source, destination))
+                        if (MovePileTo(p, source, destination, true))
                             return true;
                     }
                     continue;
@@ -74,7 +75,7 @@ function TalonToTableau() {
             const destination = tableau[d];
             if (destination.length < 1) {
                 if (talonCard.rank == "KING") {
-                    return MovePileTo(w, waste, destination);
+                    return MovePileTo(w, waste, destination, true);
                 }
                 continue;
             };
