@@ -2,19 +2,23 @@ class Graphics {
     static markerOffset = 4;
     static cardStart = 64;
     static cardGutter = 16;
-    static textSize = 10;
+    static textSize = 11;
+    textFont() { return Graphics.textSize + "px Arial"; }
 
     constructor(canvas) {
         this.backbuffer = canvas.getContext("2d");
         this.backbufferWidth = canvas.width;
         this.backbufferHeight = canvas.height;
-        this.backbuffer.font = Graphics.textSize + "px Arial";
     }
 
-    drawText(text, x, y, color, align = "left") {
+    drawText(text, x, y, color, align = "left", textSize = Graphics.textSize) {
+        var previoustxtSize = Graphics.textSize;
+        Graphics.textSize = textSize;
+        this.backbuffer.font = this.textFont();
         this.backbuffer.textAlign = align;
         this.backbuffer.fillStyle = color;
         this.backbuffer.fillText(text, x, y);
+        Graphics.textSize = previoustxtSize;
     }
 
     drawMarker(x, y) {

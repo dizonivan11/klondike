@@ -70,15 +70,43 @@ class Card {
         this.faced = !this.faced;
     }
 
+    SuiteText() {
+        switch(this.suite) {
+            case Suites.DIAMONDS: return String.fromCharCode(9830);
+            case Suites.HEARTS: return String.fromCharCode(9829);
+            case Suites.CLUBS: return String.fromCharCode(9827);
+            case Suites.SPADES: return String.fromCharCode(9824);
+        }
+        return "";
+    }
+
+    RankText() {
+        switch(Ranks[this.rank]) {
+            case Ranks.KING: return "K";
+            case Ranks.QUEEN: return "Q";
+            case Ranks.JACK: return "J";
+            case Ranks.TEN: return "10";
+            case Ranks.NINE: return "9";
+            case Ranks.EIGHT: return "8";
+            case Ranks.SEVEN: return "7";
+            case Ranks.SIX: return "6";
+            case Ranks.FIVE: return "5";
+            case Ranks.FOUR: return "4";
+            case Ranks.THREE: return "3";
+            case Ranks.TWO: return "2";
+            case Ranks.ACE: return "A";
+        }
+        return "";
+    }
+
     Draw(graphics, x, y) {
         if (this.faced) {
             graphics.backbuffer.fillStyle = "#efefef";
             graphics.backbuffer.fillRect(x, y, Card.width, Card.height);
             graphics.backbuffer.strokeRect(x, y, Card.width, Card.height);
 
-            graphics.drawText(this.suite[0] + "-" + this.rank.substring(0, 2), x + Card.miniTextOffset, y + Graphics.textSize + (Card.miniTextOffset / 2), this.Color());
-
-            graphics.drawText(this.suite, x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center");
+            graphics.drawText(this.SuiteText() + '-' + this.RankText(), x + Card.miniTextOffset, y + Graphics.textSize + (Card.miniTextOffset / 2), this.Color());
+            graphics.drawText(this.SuiteText(), x + (Card.width / 2), y + (Card.height / 2), this.Color(), "center", 20);
             graphics.drawText(this.rank, x + (Card.width / 2), y + (Card.height / 2) + Graphics.textSize, this.Color(), "center");
         } else {
             graphics.backbuffer.fillStyle = "#ccccff";
