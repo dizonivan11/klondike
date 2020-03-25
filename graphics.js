@@ -82,6 +82,18 @@ class Graphics {
 	    for (var f = 0; f < foundation.length; f++) {
 	    	this.drawMarker(pos.x, pos.y);
 	    	pos.x += this.getNextX();
+        }
+        
+        // Reposition draw coordinate for foundation top card
+        pos = this.getRawPosition(3, 0);
+
+        // Draw foundation top card
+	    for (var f = 0; f < foundation.length; f++) {
+            const fn = foundation[f];
+            if (fn.length > 0) {
+                fn[fn.length - 1].Draw(graphics, pos.x, pos.y);
+                pos.x += this.getNextX();
+            }
 	    }
 	    // --------------------------------------------------
 
