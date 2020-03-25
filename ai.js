@@ -25,7 +25,7 @@ function CanTurnOverTo(card, foundation) {
         return false;
     }
     var lastCard = foundation[foundation.length - 1];
-    return card.Color() == lastCard.Color() && Ranks[card.rank] - 1 == Ranks[lastCard.rank];
+    return card.suite == lastCard.suite && Ranks[card.rank] - 1 == Ranks[lastCard.rank];
 }
 
 function MovePileTo(pileStart, source, destination, isKing = false) {
