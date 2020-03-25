@@ -6,6 +6,7 @@ class Card {
     static pileOffset = 16;
     static miniTextOffset = 4;
     static deckCardOffset = 1;
+    static foundationCardOffset = 1;
     static wasteCardOffset = 4;
     static Blank = new Card("NONE", "NONE");
     Color() { return this.suite == Suites.HEARTS || this.suite == Suites.DIAMONDS ? "#ff0000" : "#000000"; }

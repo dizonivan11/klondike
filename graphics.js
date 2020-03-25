@@ -48,7 +48,7 @@ class Graphics {
         this.drawMarker(pos.x, pos.y);
         
         // Draw deck cards
-	    for (var d = 0; d < deck.length; d++) {
+	    for (let d = 0; d < deck.length; d++) {
             deck[d].Draw(graphics, pos.x, pos.y);
 	    	pos.y -= Card.deckCardOffset;
 	    }
@@ -64,7 +64,7 @@ class Graphics {
         this.drawMarker(pos.x, pos.y);
         
         // Draw waste cards
-	    for (var w = waste.length - 3; w < waste.length; w++) {
+	    for (let w = waste.length - 3; w < waste.length; w++) {
             if (w < 0) continue;
             
             waste[w].Draw(graphics, pos.x, pos.y);
@@ -79,21 +79,25 @@ class Graphics {
 	    pos = this.getRawPosition(3, 0);
 
 	    // Draw foundation markers
-	    for (var f = 0; f < foundation.length; f++) {
+	    for (let f = 0; f < foundation.length; f++) {
 	    	this.drawMarker(pos.x, pos.y);
 	    	pos.x += this.getNextX();
         }
         
-        // Reposition draw coordinate for foundation top card
+        // Reposition draw coordinate for foundation cards
         pos = this.getRawPosition(3, 0);
+        var yCardStart = pos.y;
 
-        // Draw foundation top card
-	    for (var f = 0; f < foundation.length; f++) {
+        // Draw foundation cards
+	    for (let f = 0; f < foundation.length; f++) {
             const fn = foundation[f];
-            if (fn.length > 0) {
-                fn[fn.length - 1].Draw(graphics, pos.x, pos.y);
-                pos.x += this.getNextX();
+
+            for (let c = 0; c < fn.length; c++) {
+                fn[c].Draw(graphics, pos.x, pos.y);
+                pos.y -= Card.foundationCardOffset;
             }
+            pos.x += this.getNextX();
+            pos.y = yCardStart;
 	    }
 	    // --------------------------------------------------
 
@@ -104,7 +108,7 @@ class Graphics {
         pos = this.getRawPosition(0, 1.5);
 
         // Draw tableau markers
-        for (var t = 0; t < tableau.length; t++) {
+        for (let t = 0; t < tableau.length; t++) {
             this.drawMarker(pos.x, pos.y);
             pos.x += this.getNextX();
         }
@@ -114,8 +118,8 @@ class Graphics {
         var yPileStart = pos.y;
 
         // Draw tableau piles
-        for (var t = 0; t < tableau.length; t++) {
-            for (var p = 0; p < tableau[t].length; p++) {
+        for (let t = 0; t < tableau.length; t++) {
+            for (let p = 0; p < tableau[t].length; p++) {
                 tableau[t][p].Draw(this, pos.x, pos.y);
                 pos.y += Card.pileOffset;
             }
