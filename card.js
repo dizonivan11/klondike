@@ -11,9 +11,10 @@ class Card {
     static Blank = new Card("NONE", "NONE");
     Color() { return this.suite == Suites.HEARTS || this.suite == Suites.DIAMONDS ? "#ff0000" : "#000000"; }
 
-    constructor(suite, rank) {
+    constructor(suite, rank, image) {
         this.suite = suite;
         this.rank = rank;
+        this.image = image;
         this.faced = false;
         this.previousParent = null;
     }
@@ -22,7 +23,7 @@ class Card {
         var deck = [];
         for (var suite in Suites) {
             for (var rank in Ranks) {
-                deck.push(new Card(suite, rank));
+                deck.push(new Card(suite, rank, Images[suite][rank]));
             }
         }
         return deck;
